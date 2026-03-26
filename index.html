@@ -6,9 +6,12 @@
   <title>Controle Financeiro</title>
 
   <link rel="stylesheet" href="style.css">
-
-  <!-- Chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icon.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="icon.png">
 </head>
 
 <body>
@@ -22,46 +25,25 @@
   </div>
 
   <div class="card">
-    <form id="form">
-
-      <select id="categoria" required>
-        <option value="">Categoria</option>
-        <option>Compras Apto</option>
-        <option>Nubank</option>
-        <option>Sicredi</option>
-        <option>Condomínio Cyrela</option>
-        <option>Parcela Terreno Cyrela</option>
-        <option>Condomínio Apartamento</option>
-        <option>Luz Apartamento</option>
-        <option>Internet Apartamento</option>
-        <option>Estacionamento</option>
-        <option>IPTU Cyrela</option>
-        <option>Treino Gustavo</option>
-      </select>
-
-      <input type="text" id="valor" placeholder="Valor (ex: 150,75)" required>
-
-      <label>Data de pagamento</label>
-      <input type="date" id="dataPagamento" required>
-
-      <label>Mês de competência</label>
-      <input type="month" id="competencia" required>
-
-      <textarea id="comentario" placeholder="Comentário"></textarea>
-
-      <button type="submit">Salvar</button>
-    </form>
+    <button onclick="exportar()">📤 Exportar</button>
+    <input type="file" id="importarArquivo">
+    <button onclick="importar()">📥 Importar</button>
   </div>
 
   <div class="card">
-    <canvas id="grafico"></canvas>
+    <h3>📊 Por Categoria</h3>
+    <canvas id="graficoCategoria"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>📈 Evolução Mensal</h3>
+    <canvas id="graficoMensal"></canvas>
   </div>
 
   <ul id="lista"></ul>
 
 </div>
 
-<!-- 🔥 IMPORTANTE -->
 <script type="module" src="script.js"></script>
 
 </body>

@@ -1,7 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// 🔥 COLE SUA CONFIG AQUI (substitua tudo abaixo)
+// SUA CONFIG AQUI
   const firebaseConfig = {
     apiKey: "AIzaSyC2aUpnODiQKBVttHLiSOZUcKpz5Q9Qcl4",
     authDomain: "controle-financeiro-b56e4.firebaseapp.com",
@@ -10,34 +11,20 @@ import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } 
     messagingSenderId: "290516225699",
     appId: "1:290516225699:web:8f708c08c2f2d9ca287916",
     measurementId: "G-PS7H04Q1BR"
-  };
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ELEMENTOS
-const form = document.getElementById("form");
 const lista = document.getElementById("lista");
 const filtroMes = document.getElementById("filtroMes");
 
 let gastos = [];
-let editId = null;
 
-// MÊS ATUAL
 const hoje = new Date();
 filtroMes.value = hoje.toISOString().slice(0, 7);
 
-// FUNÇÕES
-function tratarValor(valor) {
-  return parseFloat(valor.replace(",", "."));
-}
-
-function formatarData(data) {
-  const [ano, mes, dia] = data.split("-");
-  return `${dia}/${mes}/${ano}`;
-}
-
-// 🔄 CARREGAR DADOS
+// CARREGAR
 async function carregar() {
   const snapshot = await getDocs(collection(db, "gastos"));
 
@@ -49,111 +36,124 @@ async function carregar() {
   renderizar();
 }
 
-// ➕ SALVAR
-async function salvarFirebase(gasto) {
-  if (editId) {
-    await updateDoc(doc(db, "gastos", editId), gasto);
-    editId = null;
-  } else {
-    await addDoc(collection(db, "gastos"), gasto);
-  }
+// FORMATOS
+function formatarData(data) {
+  const [ano, mes, dia] = data.split("-");
+  return `${dia}/${mes}/${ano}`;
 }
 
-// ❌ EXCLUIR
-window.excluir = async function (id) {
-  if (confirm("Deseja excluir?")) {
-    await deleteDoc(doc(db, "gastos", id));
-    carregar();
-  }
-};
-
-// ✏️ EDITAR
-window.editar = function (id) {
-  const g = gastos.find(g => g.id === id);
-
-  categoria.value = g.categoria;
-  valor.value = g.valor;
-  dataPagamento.value = g.dataPagamento;
-  competencia.value = g.competencia;
-  comentario.value = g.comentario;
-
-  editId = id;
-};
-
-// 🎯 RENDER
+// RENDER
 function renderizar() {
   lista.innerHTML = "";
 
-  let filtrados = gastos.filter(g => g.competencia === filtroMes.value);
+  const filtrados = gastos.filter(g => g.competencia === filtroMes.value);
 
   filtrados.forEach(g => {
     const li = document.createElement("li");
-
     li.innerHTML = `
       <strong>${g.categoria}</strong>
       <div>R$ ${g.valor.toFixed(2)}</div>
-      <div>Pagamento: ${formatarData(g.dataPagamento)}</div>
-      <div>${g.comentario || ""}</div>
-
-      <div class="actions">
-        <button onclick="editar('${g.id}')">Editar</button>
-        <button onclick="excluir('${g.id}')">X</button>
-      </div>
+      <div>${formatarData(g.dataPagamento)}</div>
     `;
-
     lista.appendChild(li);
   });
 
   atualizarTotal(filtrados);
-  gerarGrafico(filtrados);
+  graficoCategoria(filtrados);
+  graficoMensal();
 }
 
-// 💰 TOTAL
-function atualizarTotal(listaFiltrada) {
-  const total = listaFiltrada.reduce((acc, g) => acc + g.valor, 0);
+// TOTAL
+function atualizarTotal(lista) {
+  const total = lista.reduce((acc, g) => acc + g.valor, 0);
   document.getElementById("total").innerText = `R$ ${total.toFixed(2)}`;
 }
 
-// 📊 GRÁFICO
-let chart;
-
-function gerarGrafico(lista) {
-  const categorias = {};
+// 📊 CATEGORIA
+let chart1;
+function graficoCategoria(lista) {
+  const dados = {};
 
   lista.forEach(g => {
-    categorias[g.categoria] = (categorias[g.categoria] || 0) + g.valor;
+    dados[g.categoria] = (dados[g.categoria] || 0) + g.valor;
   });
 
-  if (chart) chart.destroy();
+  if (chart1) chart1.destroy();
 
-  chart = new Chart(document.getElementById("grafico"), {
+  chart1 = new Chart(document.getElementById("graficoCategoria"), {
     type: "doughnut",
     data: {
-      labels: Object.keys(categorias),
-      datasets: [{ data: Object.values(categorias) }]
+      labels: Object.keys(dados),
+      datasets: [{ data: Object.values(dados) }]
     }
   });
 }
 
-// SUBMIT
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// 📈 EVOLUÇÃO
+let chart2;
+function graficoMensal() {
+  const dados = {};
 
-  const gasto = {
-    categoria: categoria.value,
-    valor: tratarValor(valor.value),
-    dataPagamento: dataPagamento.value,
-    competencia: competencia.value,
-    comentario: comentario.value
-  };
+  gastos.forEach(g => {
+    dados[g.competencia] = (dados[g.competencia] || 0) + g.valor;
+  });
 
-  await salvarFirebase(gasto);
+  const meses = Object.keys(dados).sort();
 
-  form.reset();
+  if (chart2) chart2.destroy();
+
+  chart2 = new Chart(document.getElementById("graficoMensal"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [{ data: meses.map(m => dados[m]) }]
+    }
+  });
+}
+
+// 📤 EXPORTAR CSV
+window.exportar = function () {
+  let csv = "categoria,valor,dataPagamento,competencia,comentario\n";
+
+  gastos.forEach(g => {
+    csv += `${g.categoria},${g.valor},${g.dataPagamento},${g.competencia},${g.comentario || ""}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup.csv";
+  a.click();
+};
+
+// 📥 IMPORTAR
+window.importar = async function () {
+  const file = document.getElementById("importarArquivo").files[0];
+  if (!file) return alert("Selecione um arquivo");
+
+  const text = await file.text();
+  const linhas = text.split("\n").slice(1);
+
+  for (let linha of linhas) {
+    if (!linha) continue;
+
+    const [categoria, valor, dataPagamento, competencia, comentario] = linha.split(",");
+
+    await addDoc(collection(db, "gastos"), {
+      categoria,
+      valor: parseFloat(valor),
+      dataPagamento,
+      competencia,
+      comentario
+    });
+  }
+
+  alert("Importado!");
   carregar();
-});
+};
 
 filtroMes.addEventListener("change", renderizar);
 
-// INICIAR
 carregar();
