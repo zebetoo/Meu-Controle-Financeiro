@@ -60,15 +60,15 @@ async function salvarFirebase(gasto) {
 }
 
 // ❌ EXCLUIR
-async function excluir(id) {
+window.excluir = async function (id) {
   if (confirm("Deseja excluir?")) {
     await deleteDoc(doc(db, "gastos", id));
     carregar();
   }
-}
+};
 
 // ✏️ EDITAR
-function editar(id) {
+window.editar = function (id) {
   const g = gastos.find(g => g.id === id);
 
   categoria.value = g.categoria;
@@ -78,7 +78,7 @@ function editar(id) {
   comentario.value = g.comentario;
 
   editId = id;
-}
+};
 
 // 🎯 RENDER
 function renderizar() {
