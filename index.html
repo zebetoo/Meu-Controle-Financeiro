@@ -4,23 +4,66 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle Financeiro</title>
+
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>💰 Controle Financeiro</h1>
+<div class="container">
+  <h1>💰 Controle Financeiro</h1>
 
-    <form id="form">
-      <input type="text" id="conta" placeholder="Conta (ex: luz)" required>
-      <input type="number" id="valor" placeholder="Valor" required>
-      <input type="date" id="data" required>
-      <button type="submit">Adicionar</button>
-    </form>
-
-    <ul id="lista"></ul>
+  <div class="card">
+    <h2 id="total">R$ 0</h2>
+    <input type="month" id="filtroMes">
   </div>
 
-  <script src="script.js"></script>
+  <div class="card">
+    <form id="form">
+
+      <select id="categoria" required>
+        <option value="">Categoria</option>
+        <option>Compras Apto</option>
+        <option>Nubank</option>
+        <option>Sicredi</option>
+        <option>Condomínio Cyrela</option>
+        <option>Parcela Terreno Cyrela</option>
+        <option>Condomínio Apartamento</option>
+        <option>Luz Apartamento</option>
+        <option>Internet Apartamento</option>
+        <option>Estacionamento</option>
+        <option>IPTU Cyrela</option>
+        <option>Treino Gustavo</option>
+      </select>
+
+      <input type="text" id="valor" placeholder="Valor (ex: 150,75)" required>
+
+      <label>Data de pagamento</label>
+      <input type="date" id="dataPagamento" required>
+
+      <label>Mês de competência</label>
+      <input type="month" id="competencia" required>
+
+      <textarea id="comentario" placeholder="Comentário"></textarea>
+
+      <button type="submit">Salvar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <canvas id="grafico"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>📊 Dashboard</h3>
+    <div id="dashboard"></div>
+  </div>
+
+  <ul id="lista"></ul>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
