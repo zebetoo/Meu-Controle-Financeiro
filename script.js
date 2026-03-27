@@ -19,6 +19,16 @@ const db = getFirestore(app);
 const lista = document.getElementById("lista");
 const filtroMes = document.getElementById("filtroMes");
 
+const campoCompetencia = document.getElementById("competencia");
+
+// inicializa
+campoCompetencia.value = filtroMes.value;
+
+// sincroniza com filtro
+filtroMes.addEventListener("change", () => {
+  campoCompetencia.value = filtroMes.value;
+});
+
 let gastos = [];
 
 const hoje = new Date();
@@ -157,3 +167,54 @@ window.importar = async function () {
 filtroMes.addEventListener("change", renderizar);
 
 carregar();
+
+// MODAL
+window.abrirModal = function () {
+  document.getElementById("modal").style.display = "block";
+};
+
+window.fecharModal = function () {
+  document.getElementById("modal").style.display = "none";
+};
+
+// TOAST
+function mostrarToast() {
+  const toast = document.getElementById("toast");
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 2000);
+}
+
+// FORMATAÇÃO DE VALOR
+const campoValor = document.getElementById("valor");
+
+campoValor.addEventListener("input", () => {
+  let v = campoValor.value.replace(/\D/g, "");
+
+  v = (v / 100).toFixed(2) + "";
+  v = v.replace(".", ",");
+
+  campoValor.value = v;
+});
+
+// AO SALVAR
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const gasto = {
+    categoria: categoria.value,
+    valor: parseFloat(valor.value.replace(",", ".")),
+    dataPagamento: dataPagamento.value,
+    competencia: competencia.value,
+    comentario: comentario.value
+  };
+
+  await salvarFirebase(gasto);
+
+  form.reset();
+  fecharModal();
+  mostrarToast();
+  carregar();
+});

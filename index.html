@@ -9,9 +9,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="apple-touch-icon" href="icon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="icon.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="icon.png">
 </head>
 
 <body>
@@ -22,12 +19,6 @@
   <div class="card">
     <h2 id="total">R$ 0</h2>
     <input type="month" id="filtroMes">
-  </div>
-
-  <div class="card">
-    <button onclick="exportar()">📤 Exportar</button>
-    <input type="file" id="importarArquivo">
-    <button onclick="importar()">📥 Importar</button>
   </div>
 
   <div class="card">
@@ -42,7 +33,57 @@
 
   <ul id="lista"></ul>
 
+  <div class="card">
+    <h3>📦 Backup</h3>
+    <button onclick="exportar()">📤 Exportar</button>
+    <input type="file" id="importarArquivo">
+    <button onclick="importar()">📥 Importar</button>
+  </div>
 </div>
+
+<!-- BOTÃO FLUTUANTE -->
+<button id="fab" onclick="abrirModal()">＋</button>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+
+    <h3>Novo Lançamento</h3>
+
+    <form id="form">
+
+      <select id="categoria" required>
+        <option value="">Categoria</option>
+        <option>Compras Apto</option>
+        <option>Nubank</option>
+        <option>Sicredi</option>
+        <option>Condomínio Cyrela</option>
+        <option>Parcela Terreno Cyrela</option>
+        <option>Condomínio Apartamento</option>
+        <option>Luz Apartamento</option>
+        <option>Internet Apartamento</option>
+        <option>Treino Gustavo</option>
+        <option>Estacionamento</option>
+        <option>IPTU Cyrela</option>
+      </select>
+
+      <input type="text" id="valor" placeholder="R$ 0,00" required>
+
+      <input type="date" id="dataPagamento" required>
+      <input type="month" id="competencia" required>
+
+      <textarea id="comentario" placeholder="Comentário"></textarea>
+
+      <button type="submit">Salvar</button>
+      <button type="button" onclick="fecharModal()">Cancelar</button>
+
+    </form>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">Salvo com sucesso!</div>
 
 <script type="module" src="script.js"></script>
 
